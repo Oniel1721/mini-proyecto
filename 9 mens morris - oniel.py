@@ -1,12 +1,3 @@
-# def create_board():
-#   return ['*--*--*',
-#           '|*-*-*|',
-#           '||***||',
-#           '*** ***',
-#           '||***||',
-#           '|*-*-*|',
-#           '*--*--*']
-
 def create_board():
   return [['*','-','-','*','-','-','*'],
           ['|','*','-','*','-','*','|'],
@@ -42,8 +33,7 @@ def seleccionar(board,turno):
   return fil,col
 
 def tipo_ficha(turno):
-  if turno == 1:
-    return "☺",2
+  if turno == 1: return "☺",2
   return "☻",1
 
 def goteo(board,turno):
@@ -65,21 +55,15 @@ def hor_ver_moves(board,fil,col):
   else:
     move = 1
   if col-move >= 0 and col+move <= 6:
-    print('+En ambos')
-    if board[fil][col-move] != '*' and board[fil][col+move] != '*':
-      print('!en ambos')
-      return False
+    if board[fil][col-move] == '*' and board[fil][col+move] == '*':
+      return True,'='
   if col+move > 6:
-    print ('+en solo izquierda')
-    if board[fil][col-move] != '*':
-      print ('!en solo izquierda')
-      return False
+    if board[fil][col-move] == '*':
+      return True,'-'
   if col-move < 0:
-    print ('+en solo derecha')
-    if board[fil][col+move] != '*':
-      print ('!en solo derecha')
-      return False
-  return True
+    if board[fil][col+move] == '*':
+      return True,'+'
+  return False,'!'
 
 def ficha_move(board,turno,fil,col):
   tipo,turno = tipo_ficha(turno)
@@ -88,17 +72,158 @@ def ficha_move(board,turno,fil,col):
     return True
   return False
 
+def moves(board,turno,fil,col,direccion_x,direccion_y):
+  if fil < 3:
+    move = (6-fil) - 3
+  elif fil > 3:
+    move = fil - 3
+  else:
+    move = 1
+  ficha,turno = tipo_ficha(turno)
+
+  if direccion_x == '!':
+    if direccion_y == '>':
+      board[fil][col] = '*'
+      col += move 
+      board[fil][col] = ficha
+      return board
+    if direccion_y == '<':
+      board[fil][col] = '*'
+      col -= move 
+      board[fil][col] = ficha
+      return board
+  
+  if direccion_y == '!':
+    if direccion_x == '>':
+      board[fil][col] = '*'
+      fil += move 
+      board[fil][col] = ficha
+      return board
+    if direccion_x == '<':
+      board[fil][col] = '*'
+      fil -= move 
+      board[fil][col] = ficha
+      return board
+
+  if direccion_x == '=' and direccion_y == '=':
+    ubi = input('Escribe nueva ubicacion (u)(d)(l)(r)')
+    if ubi == 'u':
+      board[fil][col] = '*'
+      col -= move 
+      board[fil][col] = ficha
+      return board
+    elif ubi == 'd':
+      board[fil][col] = '*'
+      col += move 
+      board[fil][col] = ficha
+      return board
+    elif ubi == 'l':
+      board[fil][col] = '*'
+      fil -= move 
+      board[fil][col] = ficha
+      return board
+    elif ubi == 'r':
+      board[fil][col] = '*'
+      fil += move 
+      board[fil][col] = ficha
+      return board
+    else: return moves(board,turno,fil,col,direccion_x,direccion_y)
+  
+  if direccion_x == '=':
+    if direccion_y == '<':
+      ubi = input('Escribe nueva ubicacion (u)(l)(r)')
+      if ubi == 'u':
+        board[fil][col] = '*'
+        col -= move 
+        board[fil][col] = ficha
+        return board
+      elif ubi == 'l':
+        board[fil][col] = '*'
+        fil -= move 
+        board[fil][col] = ficha
+        return board
+      elif ubi == 'r':
+        board[fil][col] = '*'
+        fil += move 
+        board[fil][col] = ficha
+        return board
+      else: return moves(board,turno,fil,col,direccion_x,direccion_y)
+    if direccion_y == '>':
+      ubi = input('Escribe nueva ubicacion (d)(l)(r)')
+      if ubi == 'd':
+        board[fil][col] = '*'
+        col += move 
+        board[fil][col] = ficha
+        return board
+      elif ubi == 'l':
+        board[fil][col] = '*'
+        fil -= move 
+        board[fil][col] = ficha
+        return board
+      elif ubi == 'r':
+        board[fil][col] = '*'
+        fil += move 
+        board[fil][col] = ficha
+        return board
+      else: return moves(board,turno,fil,col,direccion_x,direccion_y)
+
+  if direccion_y == '=':
+    if direccion_x == '<':
+      ubi = input('Escribe nueva ubicacion (u)(d)(l)')
+      if ubi == 'u':
+        board[fil][col] = '*'
+        col -= move 
+        board[fil][col] = ficha
+        return board
+      elif ubi == 'd':
+        board[fil][col] = '*'
+        col += move 
+        board[fil][col] = ficha
+        return board
+      elif ubi == 'l':
+        board[fil][col] = '*'
+        fil -= move 
+        board[fil][col] = ficha
+        return board
+      else: return moves(board,turno,fil,col,direccion_x,direccion_y)
+
+    if direccion_x == '>':
+      ubi = input('Escribe nueva ubicacion (u)(d)(r)')
+      if ubi == 'u':
+        board[fil][col] = '*'
+        col -= move 
+        board[fil][col] = ficha
+        return board
+      elif ubi == 'd':
+        board[fil][col] = '*'
+        col += move 
+        board[fil][col] = ficha
+        return board
+      elif ubi == 'r':
+        board[fil][col] = '*'
+        fil += move 
+        board[fil][col] = ficha
+        return board
+      else: return moves(board,turno,fil,col,direccion_x,direccion_y)
+
 
 def dezlice(board,turno):
   fil,col = seleccionar(board,turno)
-  if hor_ver_moves(board,fil,col) or hor_ver_moves(board,col,fil):
+  allow_x,direccion_x = hor_ver_moves(board,fil,col)
+  allow_y,direccion_y = hor_ver_moves(board,col,fil)
+  if allow_x or allow_y:
     if ficha_move(board,turno,fil,col):
       board[fil][col] = 'X'
+      print_board(board)
+      board = moves(board,turno,fil,col,direccion_x,direccion_y)
     else:
-      print('Esa ficha no te pertenece')
+      print('Esa no es tu ficha.')
+      return dezlice(board,turno)
   else:
     print('No tiene movimientos')
     return dezlice(board,turno)
+  if turno == 1: turno = 2
+  else: turno = 1
   return board,turno
 
 def game_loop():
