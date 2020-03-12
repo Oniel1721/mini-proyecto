@@ -57,7 +57,7 @@ def goteo(board,turno):
   return board,turno
 
 
-def horizontal_moves(board,fil,col):
+def hor_ver_moves(board,fil,col):
   if fil < 3:
     move = (6-fil) - 3
   elif fil > 3:
@@ -81,17 +81,21 @@ def horizontal_moves(board,fil,col):
       return False
   return True
 
-def vertical_moves(board,fil,col):
-  return True
-def diagonal_moves(board,fil,col):
-  return True
-
+def ficha_move(board,turno,fil,col):
+  tipo,turno = tipo_ficha(turno)
+  print('ficha_move')
+  if board [fil][col] == tipo:
+    return True
+  return False
 
 
 def dezlice(board,turno):
   fil,col = seleccionar(board,turno)
-  if horizontal_moves(board,fil,col):
-    board [fil][col] = 'X'
+  if hor_ver_moves(board,fil,col) or hor_ver_moves(board,col,fil):
+    if ficha_move(board,turno,fil,col):
+      board[fil][col] = 'X'
+    else:
+      print('Esa ficha no te pertenece')
   else:
     print('No tiene movimientos')
     return dezlice(board,turno)
