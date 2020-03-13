@@ -371,18 +371,60 @@ def dezlice(board,turno):
   else: turno = 1
   return board,turno
 
+def molino(board,turno):
+  ficha,turno = tipo_ficha(turno)
+  print('Dentro de molino')
+  for fil in range(0,7):
+    if fil < 3:
+      move = (6-fil) - 3
+      col = fil
+      col_2 = col
+    elif fil > 3:
+      move = fil - 3
+      col = 6-fil
+      col_2 = col
+    else:
+      move = 1
+      col = 0
+      col_2 = 4
+
+    if (board[fil][col] == ficha or board[fil][col_2] == ficha) and (board[fil][col+move] == ficha or board[fil][col_2+move] == ficha) and (board[fil][col+(move*2)] == ficha or board[fil][col_2+(move*2)] == ficha):
+      return True
+
+  for col in range(0,7):
+    if col < 3:
+      move = (6-col) - 3
+      fil = col
+      fil_2 = fil
+    elif col > 3:
+      move = col - 3
+      fil = 6-col
+      fil_2 = fil
+    else:
+      move = 1
+      fil = 0
+      fil_2 = 4
+
+    if (board[fil][col] == ficha or board[fil][col_2] == ficha) and (board[fil+move][col] == ficha or board[fil+move][col_2] == ficha) and (board[fil+(move*2)][col] == ficha or board[fil+(move*2)][col_2] == ficha):
+      return True
+  
+  return False
+
 def game_loop():
   board = create_board()
   turno = 1
   etapa = 1
   while turno == 1 or turno == 2:
     print_board(board)
+    if molino(board,turno):
+      print('Hay un molino')
     if etapa == 1:
       print (fichas(board))
       board,turno = goteo(board,turno)
       if fichas(board) == False:
         etapa = 2
       continue
-    board,turno = dezlice(board,turno)
+    if etapa == 2:
+      board,turno = dezlice(board,turno)
 
 game_loop()
