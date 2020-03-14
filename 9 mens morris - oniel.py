@@ -14,23 +14,21 @@ def print_board(board):
   except:
     print(board)
     
-def fichas(board):
-  num_white = 0
-  num_black = 0
-  for i in board:
-    num_black += i.count("☻")
-    num_white += i.count("☺")
-  num_white = 3 - num_white
-  num_black = 3 - num_black
-  if num_black + num_white == 0:
-    return False
-  return [(str(num_white)+" "+"☺" * num_white),(str(num_black)+" "+"☻" * num_black)]
+# def fichas(board,white,black):
+#   for i in board:
+#     black += i.count("☻")
+#     white += i.count("☺")
+#   white = 3 - white
+#   black = 3 - black
+#   if len(white) == 0 and len(black) == 0:
+#     return False,[],[]
+#   return [(str(white)+" "+"☺" * white),(str(black)+" "+"☻" * black)]
   
 
 def not_valid(board,fil,col):
   return fil + col > 12 or board[fil][col] != "*"
 
-def seleccionar(board,turno):
+def seleccionar():
   fil = int(input("Indique fila: "))
   col = int(input("Indique columna: "))
   return fil,col
@@ -39,15 +37,17 @@ def tipo_ficha(turno):
   if turno == 1: return "☺",2
   return "☻",1
 
-def goteo(board,turno):
-  fil,col = seleccionar(board,turno)
+def goteo(board,turno,white,black):
+  fil,col = seleccionar()
   if not_valid(board,fil,col):
     print('Ups la coordenada es incorrecta.')
     print('Intentalo de nuevo.')
-    return goteo(board,turno)
+    return goteo(board,turno,white,black)
   ficha,turno = tipo_ficha(turno)
   board [fil][col] = ficha
-  return board,turno
+  if ficha == '☺': white.pop()
+  else: black.pop()
+  return board,turno,white,black
 
 
 def horizontal_moves(board,fil,col):
@@ -119,7 +119,9 @@ def moves(board,turno,fil,col,direccion_x,direccion_y):
   else:
     move_y = 1
 
+
   ficha,turno = tipo_ficha(turno)
+
 
   finish = False
 
@@ -331,7 +333,7 @@ def moves(board,turno,fil,col,direccion_x,direccion_y):
 
 
 def dezlice(board,turno):
-  fil,col = seleccionar(board,turno)
+  fil,col = seleccionar()
   allow_x,direccion_x = horizontal_moves(board,fil,col)
   allow_y,direccion_y = vertical_moves(board,fil,col)
   print('x / y')
@@ -353,6 +355,7 @@ def dezlice(board,turno):
   return board,turno
 
 def molino(board):
+
   ficha = ['☺','☻']
 
   for f in ficha:
@@ -393,19 +396,57 @@ def molino(board):
         if board[fil+move][col] == f or board[fil_2+move][col] == f:
           if board[fil+(move*2)][col] == f or board[fil_2+(move*2)][col] == f:
             return True,f
-  
+      
+    # detectar molino diagonal (opcional)
+
+    # if board[0][0] == f:
+    #   if board[1][1] == f:
+    #     if board[2][2] == f:
+    #       return True,f
+    # if board[6][6] == f:
+    #   if board[5][5] == f:
+    #     if board[4][4] == f:
+    #       return True,f
+    # if board[0][6] == f:
+    #   if board[1][5] == f:
+    #     if board[2][4] == f:
+    #       return True,f
+    # if board[6][0] == f:
+    #   if board[5][1] == f:
+    #     if board[4][2] == f:
+    #       return True,f
+
   return False,'!'
+
+def eliminar(board,ficha,white,black):
+  fil,col = seleccionar()
+  if board[fil][col] != ficha:
+    print('Debes seleccionar ' + ficha)
+    return eliminar(board,ficha,white,black)
+  else:
+    board[fil][col] = '*'
+    if ficha == '☺': white.pop()
+    else: black.pop()
+    return board,white,black
+
 
 def game_loop():
   board = create_board()
   turno = 1
   etapa = 1
+  white = ['☺','☺','☺','☺','☺','☺','☺','☺','☺']
+  black = ['☻','☻','☻','☻','☻','☻','☻','☻','☻']
   while turno == 1 or turno == 2:
     print_board(board)
     if etapa == 1:
-      print (fichas(board))
-      board,turno = goteo(board,turno)
-      if fichas(board) == False:
+      print(white,black)
+      board,turno,white,black = goteo(board,turno,white,black)
+      if len(white) == 0 and len(black) == 0:
+        mol,f = molino(board)
+        if mol:
+          if f == '☺':
+            board,white,black = eliminar(board,'☻',white,black)
+          else: board,white,black = eliminar(board,'☺',white,black)
         etapa = 2
         continue
         
@@ -414,7 +455,7 @@ def game_loop():
     mol,f = molino(board)
     if mol:
       if f == '☺':
-        print('Hay un molino de ☺')
-      else: print('Hay un molino de ☻')
+        board,white,black = eliminar(board,'☻',white,black)
+      else: board,white,black = eliminar(board,'☺',white,black)
 
 game_loop()
