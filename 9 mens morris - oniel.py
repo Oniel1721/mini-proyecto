@@ -13,16 +13,6 @@ def print_board(board):
       print (x)
   except:
     print(board)
-    
-# def fichas(board,white,black):
-#   for i in board:
-#     black += i.count("☻")
-#     white += i.count("☺")
-#   white = 3 - white
-#   black = 3 - black
-#   if len(white) == 0 and len(black) == 0:
-#     return False,[],[]
-#   return [(str(white)+" "+"☺" * white),(str(black)+" "+"☻" * black)]
   
 
 def not_valid(board,fil,col):
@@ -38,6 +28,7 @@ def tipo_ficha(turno):
   return "☻",1
 
 def goteo(board,turno,white,black):
+  print('Para colocar:')
   fil,col = seleccionar()
   if not_valid(board,fil,col):
     print('Ups la coordenada es incorrecta.')
@@ -45,8 +36,9 @@ def goteo(board,turno,white,black):
     return goteo(board,turno,white,black)
   ficha,turno = tipo_ficha(turno)
   board [fil][col] = ficha
-  if ficha == '☺': white.pop()
-  else: black.pop()
+  if ficha == '☺' and len(white) > 0:
+    white.pop()
+  if ficha == '☻' and len(black) > 0:         black.pop()
   return board,turno,white,black
 
 
@@ -103,7 +95,7 @@ def ficha_move(board,turno,fil,col):
     return True
   return False
 
-def moves(board,turno,fil,col,direccion_x,direccion_y):
+def moves(board,turno,fil,col,direccion_x,direccion_y,prot):
 
   if fil < 3:
     move_x = (6-fil) - 3
@@ -131,11 +123,13 @@ def moves(board,turno,fil,col,direccion_x,direccion_y):
       fil += move_y 
       board[fil][col] = ficha
       finish = True
+      print('solo')
     if direccion_y == '-':
       board[fil][col] = '*'
       fil -= move_y 
       board[fil][col] = ficha
       finish = True
+      print('solo')
     
   if direccion_y == '!':
     if direccion_x == '+':
@@ -144,13 +138,16 @@ def moves(board,turno,fil,col,direccion_x,direccion_y):
       print(fil,col)
       board[fil][col] = ficha
       finish = True
+      print('solo')
     if direccion_x == '-':
       board[fil][col] = '*'
       col -= move_x 
       board[fil][col] = ficha
       finish = True
+      print('solo')
 
-  print('')
+  if finish:
+    print('sin while')
 
   while finish == False:
     if direccion_x == '=' and direccion_y == '=':
@@ -329,10 +326,21 @@ def moves(board,turno,fil,col,direccion_x,direccion_y):
 
     if finish == False:
       input('algo anda mal')
-  return board
+
+  for x in prot:
+    if board[x[0]][x[1]] == '☺' and board[x[2]][x[3]] == '☺' and board[x[4]][x[5]] == '☺':
+      continue
+    elif board[x[0]][x[1]] == '☻' and board[x[2]][x[3]] == '☻' and board[x[4]][x[5]] == '☻':
+      continue
+    else:
+      prot.remove(x)
+
+  print('retorno')
+  return board,prot
 
 
-def dezlice(board,turno):
+def dezlice(board,turno,prot):
+  print('Para Seleccionar:')
   fil,col = seleccionar()
   allow_x,direccion_x = horizontal_moves(board,fil,col)
   allow_y,direccion_y = vertical_moves(board,fil,col)
@@ -343,18 +351,20 @@ def dezlice(board,turno):
     if ficha_move(board,turno,fil,col):
       board[fil][col] = 'X'
       print_board(board)
-      board = moves(board,turno,fil,col,direccion_x,direccion_y)
+      board,prot = moves(board,turno,fil,col,direccion_x,direccion_y,prot)
+      print('movio exitosamente')
     else:
       print('Esa no es tu ficha.')
-      return dezlice(board,turno)
+      return dezlice(board,turno,prot)
   else:
     print('No tiene movimientos')
-    return dezlice(board,turno)
+    return dezlice(board,turno,prot)
   if turno == 1: turno = 2
   else: turno = 1
-  return board,turno
+  print('retorno dezlice')
+  return board,turno,prot
 
-def molino(board):
+def molino(board,prot):
 
   ficha = ['☺','☻']
 
@@ -376,7 +386,15 @@ def molino(board):
       if board[fil][col] == f or board[fil][col_2] == f:
         if board[fil][col+move] == f or board[fil][col_2+move] == f:
           if board[fil][col+(move*2)] == f or board[fil][col_2+(move*2)] == f:
-            return True,f
+            if [fil,col,fil,col+move,fil,col+(move*2)] not in prot:
+              print('por fil')
+              prot.append([fil,col,fil,col+move,fil,col+(move*2)])
+              return True,f,prot
+            if [fil,col_2,fil,col_2+move,fil,col_2+(move*2)] not in prot:
+              print('por fil')
+              prot.append([fil,col_2,fil,col_2+move,fil,col_2+(move*2)])
+              return True,f,prot
+              
 
     for col in range(0,7):
       if col < 3:
@@ -395,40 +413,87 @@ def molino(board):
       if board[fil][col] == f or board[fil_2][col] == f:
         if board[fil+move][col] == f or board[fil_2+move][col] == f:
           if board[fil+(move*2)][col] == f or board[fil_2+(move*2)][col] == f:
-            return True,f
-      
-    # detectar molino diagonal (opcional)
+            if [fil,col,fil+move,col,fil+(move*2),col] not in prot:
+              print('por col')
+              prot.append([fil,col,fil+move,col,fil+(move*2),col])
+              return True,f,prot
+            if [fil_2,col,fil_2+move,col,fil_2+(move*2),col] not in prot:
+              print('por col')
+              prot.append([fil_2,col,fil_2+move,col,fil_2+(move*2),col])
+              return True,f,prot
 
-    # if board[0][0] == f:
-    #   if board[1][1] == f:
-    #     if board[2][2] == f:
-    #       return True,f
-    # if board[6][6] == f:
-    #   if board[5][5] == f:
-    #     if board[4][4] == f:
-    #       return True,f
-    # if board[0][6] == f:
-    #   if board[1][5] == f:
-    #     if board[2][4] == f:
-    #       return True,f
-    # if board[6][0] == f:
-    #   if board[5][1] == f:
-    #     if board[4][2] == f:
-    #       return True,f
+  return False,'!',prot
 
-  return False,'!'
-
-def eliminar(board,ficha,white,black):
+def eliminar(board,ficha,white,black,prot):
+  print('Para Eliminar:')
   fil,col = seleccionar()
   if board[fil][col] != ficha:
     print('Debes seleccionar ' + ficha)
-    return eliminar(board,ficha,white,black)
-  else:
-    board[fil][col] = '*'
-    if ficha == '☺': white.pop()
-    else: black.pop()
-    return board,white,black
+    return eliminar(board,ficha,white,black,prot)
+  for x in prot:
+    for i in range(0,5,2):
+      print(i)
+      if fil == x[i] and col == x[i+1]:
+        print('No puedes eliminar un ficha en molino')
+        return eliminar(board,ficha,white,black,prot)
 
+  board[fil][col] = '*'
+  if ficha == '☺' and len(white)>0: 
+    white.pop()
+  elif ficha == '☻' and len(black)>0:
+    black.pop()
+  return board,white,black
+
+def two(board,ficha):
+  simbolo = 0
+  for i in board:
+    simbolo += i.count(ficha)
+  if simbolo == 2:
+    return True
+  return False
+
+def no_moves(board,f):
+  test = []
+  for fil in range(0,7):
+    for col in range(0,7):
+      if board[fil][col] == f:
+        allowx,x=horizontal_moves(board,fil,col)
+        allowy,y=vertical_moves(board,fil,col)
+        if allowx == False and allowy == False:
+          test.append(False)
+        else:
+          test.append(True)
+  for x in test:
+    if x == True:
+      return False
+  return True
+
+
+def win(board,white,black):
+  if len(white) <= 2 or len(black) <= 2:
+    lose_1_1 = two(board,'☺')
+    lose_1_2 = two(board,'☻')
+
+    lose_2_1 = no_moves(board,'☺')
+    lose_2_2 = no_moves(board,'☻')
+    
+    loser_two = lose_1_1 or lose_2_1
+    loser_move = lose_1_2 or lose_2_2
+
+    return loser_two or loser_move
+  return False
+
+def who_win(board):
+  white_two = two(board,'☺')
+  black_two = two(board,'☻')
+
+  white_moves = no_moves(board,'☺')
+  black_moves = no_moves(board,'☻')
+
+  if white_two or white_moves:
+    return 'Felicitaciones ☻!!!'
+  if black_two or black_moves:
+    return 'Felicitaciones ☺!!!'
 
 def game_loop():
   board = create_board()
@@ -436,26 +501,48 @@ def game_loop():
   etapa = 1
   white = ['☺','☺','☺','☺','☺','☺','☺','☺','☺']
   black = ['☻','☻','☻','☻','☻','☻','☻','☻','☻']
-  while turno == 1 or turno == 2:
+  prot = []
+  game_over = False
+  while game_over == False:
+    print('Marcadas')
+    print(prot)
+    print('')
     print_board(board)
     if etapa == 1:
-      print(white,black)
+      game_over = win(board,white,black)
+      if game_over:
+        break
+      print('')
+      print(white)
+      print(black)
       board,turno,white,black = goteo(board,turno,white,black)
-      if len(white) == 0 and len(black) == 0:
-        mol,f = molino(board)
-        if mol:
-          if f == '☺':
-            board,white,black = eliminar(board,'☻',white,black)
-          else: board,white,black = eliminar(board,'☺',white,black)
+      mol,f,prot = molino(board,prot)
+      print(mol,f,prot)
+      if mol:
+        print_board(board)
+        if f == '☺':
+          print('Elimina ☻')
+          board,white,black = eliminar(board,'☻',white,black,prot)
+        else:
+          print('Elimina ☺')
+          board,white,black = eliminar(board,'☺',white,black,prot)
+      if len(white) + len(black) == 0:
         etapa = 2
         continue
         
     if etapa == 2:
-      board,turno = dezlice(board,turno)
-    mol,f = molino(board)
-    if mol:
-      if f == '☺':
-        board,white,black = eliminar(board,'☻',white,black)
-      else: board,white,black = eliminar(board,'☺',white,black)
+      game_over = win(board,white,black)
+      if game_over:
+        break
+      board,turno,prot = dezlice(board,turno,prot)
+      mol,f,prot = molino(board,prot)
+      if mol:
+        print_board(board)
+        if f == '☺':
+          board,white,black = eliminar(board,'☻',white,black,prot)
+        else: board,white,black = eliminar(board,'☺',white,black,prot)
+  print(who_win(board))
 
 game_loop()
+print('End Game')
+
