@@ -383,17 +383,22 @@ def molino(board,prot):
         col = 0
         col_2 = 4
 
-      if board[fil][col] == f or board[fil][col_2] == f:
-        if board[fil][col+move] == f or board[fil][col_2+move] == f:
-          if board[fil][col+(move*2)] == f or board[fil][col_2+(move*2)] == f:
-            if [fil,col,fil,col+move,fil,col+(move*2)] not in prot:
-              print('por fil')
-              prot.append([fil,col,fil,col+move,fil,col+(move*2)])
-              return True,f,prot
-            if [fil,col_2,fil,col_2+move,fil,col_2+(move*2)] not in prot:
-              print('por fil')
-              prot.append([fil,col_2,fil,col_2+move,fil,col_2+(move*2)])
-              return True,f,prot
+      if fil != 3:
+        if board[fil][col] == f:
+          if board[fil][col+move] == f:
+            if board[fil][col+(move*2)] == f:
+              if [fil,col,fil,col+move,fil,col+(move*2)] not in prot:
+                print('por fil')
+                prot.append([fil,col,fil,col+move,fil,col+(move*2)])
+                return True,f,prot
+      else:
+        if board[fil][col_2] == f:
+          if board[fil][col_2+move] == f:
+            if board[fil][col_2+(move*2)] == f:
+              if [fil,col_2,fil,col_2+move,fil,col_2+(move*2)] not in prot:
+                print('por fil')
+                prot.append([fil,col_2,fil,col_2+move,fil,col_2+(move*2)])
+                return True,f,prot
               
 
     for col in range(0,7):
@@ -410,21 +415,59 @@ def molino(board,prot):
         fil = 0
         fil_2 = 4
 
-      if board[fil][col] == f or board[fil_2][col] == f:
-        if board[fil+move][col] == f or board[fil_2+move][col] == f:
-          if board[fil+(move*2)][col] == f or board[fil_2+(move*2)][col] == f:
-            if [fil,col,fil+move,col,fil+(move*2),col] not in prot:
-              print('por col')
-              prot.append([fil,col,fil+move,col,fil+(move*2),col])
-              return True,f,prot
-            if [fil_2,col,fil_2+move,col,fil_2+(move*2),col] not in prot:
-              print('por col')
-              prot.append([fil_2,col,fil_2+move,col,fil_2+(move*2),col])
-              return True,f,prot
+      if col != 3:
+        if board[fil][col] == f:
+          if board[fil+move][col] == f:
+            if board[fil+(move*2)][col] == f:
+              if [fil,col,fil+move,col,fil+(move*2),col] not in prot:
+                print('por col')
+                prot.append([fil,col,fil+move,col,fil+(move*2),col])
+                return True,f,prot
+      else:
+        if board[fil_2][col] == f:
+          if board[fil_2+move][col] == f:
+            if board[fil_2+(move*2)][col] == f:
+              if [fil_2,col,fil_2+move,col,fil_2+(move*2),col] not in prot:
+                print('por col')
+                prot.append([fil_2,col,fil_2+move,col,fil_2+(move*2),col])
+                return True,f,prot
 
   return False,'!',prot
 
+# def todo_molino(board,ficha):
+#   # if ficha == '☺': ficha = '☻'
+#   # else: ficha = '☺'
+#   prot = []
+#   elim = []
+#   mol = True
+#   i = 0
+#   while mol and i < 7:
+#     mol,f,prot = molino(board,prot)
+#     print(prot)
+#     if f != ficha:
+#       elim.append(prot[-1])
+#     i += 1
+#   for el in elim:
+#     prot.remove(el)
+#   print("mol/f/prot 2")
+#   print(mol,f,prot)
+#   for x in prot:    
+#     for i in range(0,6,2):
+#       board[x[i]][x[i+1]] = 'O'
+#   num_f = 0
+#   print('all fil')
+#   for fil in board:
+#     num_f += fil.count(ficha)
+#     print(fil)
+#   print(num_f)
+#   if num_f == 0:
+#     return True
+#   return False
+
 def eliminar(board,ficha,white,black,prot):
+  # if todo_molino(board,ficha):
+  #   print('Todas estan en molino')
+  #   return board,white,black
   print('Para Eliminar:')
   fil,col = seleccionar()
   if board[fil][col] != ficha:
