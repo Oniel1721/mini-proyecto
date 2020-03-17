@@ -1,3 +1,5 @@
+import tablero
+
 def create_board():
   return [['*','-','-','*','-','-','*'],
           ['|','*','-','*','-','*','|'],
@@ -38,7 +40,7 @@ def goteo(board,turno,white,black):
   board [fil][col] = ficha
   if ficha == '☺' and len(white) > 0:
     white.pop()
-  if ficha == '☻' and len(black) > 0:         black.pop()
+  if ficha == '☻' and len(black) > 0:                black.pop()
   return board,turno,white,black
 
 
@@ -434,40 +436,7 @@ def molino(board,prot):
 
   return False,'!',prot
 
-# def todo_molino(board,ficha):
-#   # if ficha == '☺': ficha = '☻'
-#   # else: ficha = '☺'
-#   prot = []
-#   elim = []
-#   mol = True
-#   i = 0
-#   while mol and i < 7:
-#     mol,f,prot = molino(board,prot)
-#     print(prot)
-#     if f != ficha:
-#       elim.append(prot[-1])
-#     i += 1
-#   for el in elim:
-#     prot.remove(el)
-#   print("mol/f/prot 2")
-#   print(mol,f,prot)
-#   for x in prot:    
-#     for i in range(0,6,2):
-#       board[x[i]][x[i+1]] = 'O'
-#   num_f = 0
-#   print('all fil')
-#   for fil in board:
-#     num_f += fil.count(ficha)
-#     print(fil)
-#   print(num_f)
-#   if num_f == 0:
-#     return True
-#   return False
-
 def eliminar(board,ficha,white,black,prot):
-  # if todo_molino(board,ficha):
-  #   print('Todas estan en molino')
-  #   return board,white,black
   print('Para Eliminar:')
   fil,col = seleccionar()
   if board[fil][col] != ficha:
@@ -587,6 +556,6 @@ def game_loop():
         else: board = eliminar(board,'☺',white,black,prot)
   print(who_win(board))
 
-game_loop()
-print('End Game')
+# game_loop()
+# print('End Game')
 
