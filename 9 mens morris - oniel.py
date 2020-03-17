@@ -481,11 +481,7 @@ def eliminar(board,ficha,white,black,prot):
         return eliminar(board,ficha,white,black,prot)
 
   board[fil][col] = '*'
-  if ficha == '☺' and len(white)>0: 
-    white.pop()
-  elif ficha == '☻' and len(black)>0:
-    black.pop()
-  return board,white,black
+  return board
 
 def two(board,ficha):
   simbolo = 0
@@ -541,17 +537,24 @@ def who_win(board):
 def game_loop():
   board = create_board()
   turno = 1
-  etapa = 1
   white = ['☺','☺','☺','☺','☺','☺','☺','☺','☺']
   black = ['☻','☻','☻','☻','☻','☻','☻','☻','☻']
   prot = []
   game_over = False
   while game_over == False:
+    if turno == 1:
+      fase = white
+      print('Turno 1 ☺')
+
+    else: 
+      fase = black
+      print('Turno 2 ☻')
+
     print('Marcadas')
     print(prot)
     print('')
     print_board(board)
-    if etapa == 1:
+    if len(fase) > 0:
       game_over = win(board,white,black)
       if game_over:
         break
@@ -565,15 +568,13 @@ def game_loop():
         print_board(board)
         if f == '☺':
           print('Elimina ☻')
-          board,white,black = eliminar(board,'☻',white,black,prot)
+          board = eliminar(board,'☻',white,black,prot)
         else:
           print('Elimina ☺')
-          board,white,black = eliminar(board,'☺',white,black,prot)
-      if len(white) + len(black) == 0:
-        etapa = 2
-        continue
-        
-    if etapa == 2:
+          board = eliminar(board,'☺',white,black,prot)
+      continue
+
+    if len(fase) == 0:
       game_over = win(board,white,black)
       if game_over:
         break
@@ -582,8 +583,8 @@ def game_loop():
       if mol:
         print_board(board)
         if f == '☺':
-          board,white,black = eliminar(board,'☻',white,black,prot)
-        else: board,white,black = eliminar(board,'☺',white,black,prot)
+          board = eliminar(board,'☻',white,black,prot)
+        else: board = eliminar(board,'☺',white,black,prot)
   print(who_win(board))
 
 game_loop()
