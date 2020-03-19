@@ -1,4 +1,10 @@
-import tablero
+import Player
+
+P = {
+  "1": Player.Player('Oniel','☺'),
+  "2": Player.Player('Fulano','☻')
+}
+
 
 def create_board():
   return [['*','-','-','*','-','-','*'],
@@ -40,7 +46,7 @@ def goteo(board,turno,white,black):
   board [fil][col] = ficha
   if ficha == '☺' and len(white) > 0:
     white.pop()
-  if ficha == '☻' and len(black) > 0:                black.pop()
+  if ficha == '☻' and len(black) > 0:         black.pop()
   return board,turno,white,black
 
 
@@ -477,8 +483,8 @@ def no_moves(board,f):
   return True
 
 
-def win(board,white,black):
-  if len(white) <= 2 or len(black) <= 2:
+def win(board):
+  if P["1"].mens <= 2 or P["2"].mens <= 2:
     lose_1_1 = two(board,'☺')
     lose_1_2 = two(board,'☻')
 
@@ -506,56 +512,55 @@ def who_win(board):
 def game_loop():
   board = create_board()
   turno = 1
-  white = ['☺','☺','☺','☺','☺','☺','☺','☺','☺']
-  black = ['☻','☻','☻','☻','☻','☻','☻','☻','☻']
   prot = []
   game_over = False
   while game_over == False:
     if turno == 1:
-      fase = white
-      print('Turno 1 ☺')
-
-    else: 
-      fase = black
-      print('Turno 2 ☻')
-
-    print('Marcadas')
-    print(prot)
-    print('')
+      turno = 2
+      t = "1"
+      e = "2"
+    else:
+      turno = 1 
+      t = "2"
+      e = "1"
+    print('Turno: ' + P[t].numbers_of_tokens())
     print_board(board)
-    if len(fase) > 0:
-      game_over = win(board,white,black)
+    if P[t].mens > 0:
+      game_over = win(board)
       if game_over:
         break
-      print('')
-      print(white)
-      print(black)
-      board,turno,white,black = goteo(board,turno,white,black)
+      board = P[t].drip(board)
       mol,f,prot = molino(board,prot)
       print(mol,f,prot)
       if mol:
         print_board(board)
-        if f == '☺':
-          print('Elimina ☻')
-          board = eliminar(board,'☻',white,black,prot)
-        else:
-          print('Elimina ☺')
-          board = eliminar(board,'☺',white,black,prot)
+        delete = False
+        while delete == False:
+          row,column = P[t].select()
+          if P[t].is_not_my_token(board,row,column):
+            board = P[e].delete_a_token(board,row,column)
+            delete = True
+            break
+          print("That's no an enemy token.")
       continue
-
-    if len(fase) == 0:
-      game_over = win(board,white,black)
+    if P[t].mens == 0:
+      game_over = win(board)
       if game_over:
         break
-      board,turno,prot = dezlice(board,turno,prot)
+      board = P[t].slide(board)
       mol,f,prot = molino(board,prot)
       if mol:
         print_board(board)
-        if f == '☺':
-          board = eliminar(board,'☻',white,black,prot)
-        else: board = eliminar(board,'☺',white,black,prot)
+        delete = False
+        while delete == False:
+          row,column = P[t].select()
+          if P[t].is_not_my_token(board,row,column):
+            board = P[e].delete_a_token(board,row,column)
+            delete = True
+            break
+          print("That's no an enemy token.")
   print(who_win(board))
 
-# game_loop()
-# print('End Game')
+game_loop()
+print('End Game')
 
