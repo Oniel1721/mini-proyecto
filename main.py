@@ -21,87 +21,8 @@ def print_board(board):
       print (x)
   except:
     print(board)
-  
-
-def not_valid(board,fil,col):
-  return fil + col > 12 or board[fil][col] != "*"
-
-def seleccionar():
-  fil = int(input("Indique fila: "))
-  col = int(input("Indique columna: "))
-  return fil,col
-
-def tipo_ficha(turno):
-  if turno == 1: return "☺",2
-  return "☻",1
-
-def goteo(board,turno,white,black):
-  print('Para colocar:')
-  fil,col = seleccionar()
-  if not_valid(board,fil,col):
-    print('Ups la coordenada es incorrecta.')
-    print('Intentalo de nuevo.')
-    return goteo(board,turno,white,black)
-  ficha,turno = tipo_ficha(turno)
-  board [fil][col] = ficha
-  if ficha == '☺' and len(white) > 0:
-    white.pop()
-  if ficha == '☻' and len(black) > 0:         black.pop()
-  return board,turno,white,black
 
 
-def horizontal_moves(board,fil,col):
-  if fil < 3:
-    move = (6-fil) - 3
-  elif fil > 3:
-    move = fil - 3
-  else:
-    move = 1
-
-  if col-move >= 0 and col+move <= 6:
-    if board[fil][col-move] == '*' and board[fil][col+move] == '*':
-      return True,'='
-    elif board[fil][col-move] == '*':
-      return True,'-'
-    elif board[fil][col+move] == '*':
-      return True,'+'
-  if col+move > 6:
-    if board[fil][col-move] == '*':
-      return True,'-'
-  if col-move < 0:
-    if board[fil][col+move] == '*':
-      return True,'+'
-  return False,'!'
-
-def vertical_moves(board,fil,col):
-  if col < 3:
-    move = (6-col) - 3
-  elif col > 3:
-    move = col - 3
-  else:
-    move = 1
-  
-  if fil-move >= 0 and fil+move <= 6:
-    if board[fil-move][col] == '*' and board[fil+move][col] == '*':
-      return True,'='
-    elif board[fil-move][col] == '*':
-      return True,'-'
-    elif board[fil+move][col] == '*':
-      return True,'+'
-  if fil+move > 6:
-    if board[fil-move][col] == '*':
-      return True,'-'
-  if fil-move < 0:
-    if board[fil+move][col] == '*':
-      return True,'+'
-  return False,'!'
-
-def ficha_move(board,turno,fil,col):
-  tipo,turno = tipo_ficha(turno)
-  print('ficha_move')
-  if board [fil][col] == tipo:
-    return True
-  return False
 
 def moves(board,turno,fil,col,direccion_x,direccion_y,prot):
 
@@ -347,31 +268,6 @@ def moves(board,turno,fil,col,direccion_x,direccion_y,prot):
   return board,prot
 
 
-def dezlice(board,turno,prot):
-  print('Para Seleccionar:')
-  fil,col = seleccionar()
-  allow_x,direccion_x = horizontal_moves(board,fil,col)
-  allow_y,direccion_y = vertical_moves(board,fil,col)
-  print('x / y')
-  print(direccion_x,direccion_y)
-  print(allow_x,allow_y)
-  if allow_x or allow_y:
-    if ficha_move(board,turno,fil,col):
-      board[fil][col] = 'X'
-      print_board(board)
-      board,prot = moves(board,turno,fil,col,direccion_x,direccion_y,prot)
-      print('movio exitosamente')
-    else:
-      print('Esa no es tu ficha.')
-      return dezlice(board,turno,prot)
-  else:
-    print('No tiene movimientos')
-    return dezlice(board,turno,prot)
-  if turno == 1: turno = 2
-  else: turno = 1
-  print('retorno dezlice')
-  return board,turno,prot
-
 def molino(board,prot):
 
   ficha = ['☺','☻']
@@ -512,7 +408,7 @@ def who_win(board):
 def game_loop():
   board = create_board()
   turno = 1
-  prot = []
+  mark = []
   game_over = False
   while game_over == False:
     if turno == 1:
@@ -530,9 +426,8 @@ def game_loop():
       if game_over:
         break
       board = P[t].drip(board)
-      mol,f,prot = molino(board,prot)
-      print(mol,f,prot)
-      if mol:
+      mill,mark = P[t].is_mill(board,mark)
+      if mill:
         print_board(board)
         delete = False
         while delete == False:
@@ -548,8 +443,8 @@ def game_loop():
       if game_over:
         break
       board = P[t].slide(board)
-      mol,f,prot = molino(board,prot)
-      if mol:
+      mill,mark = P[t].is_mill(board,mark)
+      if mill:
         print_board(board)
         delete = False
         while delete == False:

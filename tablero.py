@@ -2,7 +2,7 @@ class Player():
   def __init__(self,name,token):
     self.name = name
     self.token = token
-    self.mens = 9
+    self.mens = 6
   
   def numbers_of_tokens(self):
     return self.name+' '+self.token * self.mens
@@ -105,22 +105,30 @@ class Player():
     return len(direction_x + direction_y) == 1
 
   def auto_move(self,board,row,column,direction,move_x,move_y):
+    change = False
     if direction == 'd':
       if self.confirm_move(direction):
           board = self.delete_a_token(board,row,column)
           board = self.put_token(board,row+move_y,column)
+          change = True
     elif direction == 'u':
       if self.confirm_move(direction):
           board = self.delete_a_token(board,row,column)
-          board = self.put_token(board,row-move_y,column) 
+          board = self.put_token(board,row-move_y,column)
+          change = True
     elif direction == 'r':
       if self.confirm_move(direction):
         board = self.delete_a_token(board,row,column)
         board = self.put_token(board,row,column+move_x)
+        change = True
     elif direction == 'l':
       if self.confirm_move(direction):
         board = self.delete_a_token(board,row,column)
         board = self.put_token(board,row,column-move_x)
+        change = True
+    
+    if change == False:
+      return self.slide(board)
     
     return board
   
@@ -147,7 +155,7 @@ class Player():
     print('To place:')
     row,column = self.select()
     if self.is_valid(board,row,column):
-      board[row][column] = self.token
+      self.put_token(board,row,column)
       return board
     print('Select an empty space.')
     return self.drip(board)
@@ -157,7 +165,7 @@ class Player():
     row,column = self.select()
     if self.is_not_my_token(board,row,column):
       print("that's not your token")
-      return self.mark(board)
+      return self.slide(board)
     direction_x = self.horizontal_moves(board,row,column)
     direction_y = self.vertical_moves(board,row,column)
     move_x = self.steps_allowed(row)
@@ -172,5 +180,46 @@ class Player():
       print('That token has no movements')
       return self.slide(board)
     return board
+  
+  def is_mill(self,board,mark):
+    
+    for row in range(0,7):
+      move = self.steps_allowed(row)
+      column = row
+      i = 1
+      if row > 3:
+        column = 6-row
+      if row == 3:
+        column = 0
+        i = 2
+      for z in range(0,i):
+        if board[row][column] == self.token:
+          if board[row][column+move] == self.token:
+            if board[row][column+(move*2)] == self.token:
+              if [row,column,row,column+move,row,column+(move*2)] not in mark:
+                mark.append([row,column,row,column+move,row,column+(move*2)])
+                return True,mark
+        column = 4
+                
+    for column in range(0,7):
+      move = self.steps_allowed(column)
+      row = column
+      i = 1
+      if column > 3:
+        row = 6-column
+      if column == 3:
+        row = 0
+        i = 2
+      for z in range(0,i):
+        if board[row][column] == self.token:
+          if board[row+move][column] == self.token:
+            if board[row+(move*2)][column] == self.token:
+              if [row,column,row+move,column,row+(move*2),column] not in mark:
+                print('por col')
+                mark.append([row,column,row+move,column,row+(move*2),column])
+                return True,mark
+        row = 4
+
+    return False,mark
 
    
