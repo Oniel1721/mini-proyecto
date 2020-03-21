@@ -3,6 +3,7 @@ class Player():
     self.name = name
     self.token = token
     self.mens = 6
+    self.tokens_in_board = 6-self.mens
   
   def numbers_of_tokens(self):
     return self.name+' '+self.token * self.mens
@@ -22,10 +23,12 @@ class Player():
     board[row][column] = self.token
     if self.mens > 0:
       self.mens -=1
+    self.tokens_in_board = 6-self.mens
     return board
   
   def delete_a_token(self,board,row,column):
     board[row][column] = '*'
+    self.tokens_in_board -= 1
     return board
 
   def selelct_direction(self,movements):
@@ -85,7 +88,7 @@ class Player():
     return board[row][column] == self.token
 
   def is_not_my_token(self,board,row,column):
-    return board[row][column] != self.token and board[row][column] != "*" and board[row][column] != "|" and board[row][column] != "-"
+    return board[row][column] != self.token
   
   def confirm_move(self,direction):
     if direction == 'u':
@@ -215,7 +218,6 @@ class Player():
           if board[row+move][column] == self.token:
             if board[row+(move*2)][column] == self.token:
               if [row,column,row+move,column,row+(move*2),column] not in mark:
-                print('por col')
                 mark.append([row,column,row+move,column,row+(move*2),column])
                 return True,mark
         row = 4

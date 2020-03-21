@@ -354,44 +354,52 @@ def eliminar(board,ficha,white,black,prot):
   board[fil][col] = '*'
   return board
 
-def two(board,ficha):
-  simbolo = 0
-  for i in board:
-    simbolo += i.count(ficha)
-  if simbolo == 2:
-    return True
+def delete_mill(board,row,column,mark):
+  for x in mark:
+    for i in range(0,5,2):
+      if row == x[i] and column == x[i+1]:
+        return True
   return False
 
-def no_moves(board,f):
-  test = []
-  for fil in range(0,7):
-    for col in range(0,7):
-      if board[fil][col] == f:
-        allowx,x=horizontal_moves(board,fil,col)
-        allowy,y=vertical_moves(board,fil,col)
-        if allowx == False and allowy == False:
-          test.append(False)
-        else:
-          test.append(True)
-  for x in test:
-    if x == True:
-      return False
-  return True
+def lose_per_tokens():
+  for i in range(1,3):
+    if P[str(i)].tokens_in_board < 3 and P[str(i)].mens == 0:
+      return P[str(i)].name
+  return ""
+
+def no_moves(board):
+  loser = [True,True]
+  for i in range(1,3):
+    test = []
+    for row in range(0,7):
+      for column in range(0,7):
+        if board[row][column] == P[str(i)].token:
+          allowx=P[str(i)].horizontal_moves(board,row,column)
+          allowy=P[str(i)].vertical_moves(board,row,column)
+          if allowx == False and allowy == False:
+            test.append(False)
+          else:
+            test.append(True)
+    for x in test:
+      if x == True:
+        loser[i-1] = False
+    else:
+      loser[i-1] = False
+
+  return loser
 
 
 def win(board):
-  if P["1"].mens <= 2 or P["2"].mens <= 2:
-    lose_1_1 = two(board,'☺')
-    lose_1_2 = two(board,'☻')
-
-    lose_2_1 = no_moves(board,'☺')
-    lose_2_2 = no_moves(board,'☻')
-    
-    loser_two = lose_1_1 or lose_2_1
-    loser_move = lose_1_2 or lose_2_2
-
-    return loser_two or loser_move
+  loser = lose_per_tokens()
+  if loser:
+    return loser
+  loser = no_moves(board)
+  if loser[0]:
+    return P["1"].name
+  if loser[1]:
+    return P["2"].name
   return False
+
 
 def who_win(board):
   white_two = two(board,'☺')
@@ -423,6 +431,8 @@ def game_loop():
     print_board(board)
     if P[t].mens > 0:
       game_over = win(board)
+      print(game_over)
+      print(P["1"].tokens_in_board,P["2"].tokens_in_board)
       if game_over:
         break
       board = P[t].drip(board)
@@ -431,15 +441,22 @@ def game_loop():
         print_board(board)
         delete = False
         while delete == False:
+          print('To delete:')
           row,column = P[t].select()
           if P[t].is_not_my_token(board,row,column):
-            board = P[e].delete_a_token(board,row,column)
-            delete = True
-            break
+            if delete_mill(board,row,column,mark):
+              print('You cannot delete a token in mill')
+              continue
+            else:
+              board = P[e].delete_a_token(board,row,column)
+              delete = True
+              break
           print("That's no an enemy token.")
       continue
     if P[t].mens == 0:
       game_over = win(board)
+      print(game_over)
+      print(P["1"].tokens_in_board,P["2"].tokens_in_board)
       if game_over:
         break
       board = P[t].slide(board)
@@ -448,13 +465,20 @@ def game_loop():
         print_board(board)
         delete = False
         while delete == False:
+          print('To delete:')
           row,column = P[t].select()
           if P[t].is_not_my_token(board,row,column):
-            board = P[e].delete_a_token(board,row,column)
-            delete = True
-            break
+            if delete_mill(board,row,column,mark):
+              print('You cannot delete a token in mill')
+              continue
+            else:
+              board = P[e].delete_a_token(board,row,column)
+              delete = True
+              break
           print("That's no an enemy token.")
-  print(who_win(board))
+  print(game_over)
+  print(P["1"].tokens_in_board,P["2"].tokens_in_board)
+  # print(who_win(board))
 
 game_loop()
 print('End Game')
