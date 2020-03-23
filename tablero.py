@@ -2,8 +2,8 @@ class Player():
   def __init__(self,name,token):
     self.name = name
     self.token = token
-    self.mens = 6
-    self.tokens_in_board = 6-self.mens
+    self.mens = 9
+    self.tokens_in_board = 9
   
   def numbers_of_tokens(self):
     return self.name+' '+self.token * self.mens
@@ -23,7 +23,6 @@ class Player():
     board[row][column] = self.token
     if self.mens > 0:
       self.mens -=1
-    self.tokens_in_board = 6-self.mens
     return board
   
   def delete_a_token(self,board,row,column):
@@ -89,6 +88,10 @@ class Player():
 
   def is_not_my_token(self,board,row,column):
     return board[row][column] != self.token
+  
+  def is_enemy_token(self,board,row,column):
+    return board[row][column] != self.token and board[row][column] != '|' and board[row][column] != '-' and board[row][column] != '*' and board[row][column] != ' ' 
+
   
   def confirm_move(self,direction):
     if direction == 'u':

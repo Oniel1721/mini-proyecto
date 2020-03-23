@@ -2,7 +2,7 @@ import Player
 
 P = {
   "1": Player.Player('Oniel','☺'),
-  "2": Player.Player('Fulano','☻')
+  "2": Player.Player('Odabel','☻')
 }
 
 
@@ -354,7 +354,21 @@ def eliminar(board,ficha,white,black,prot):
   board[fil][col] = '*'
   return board
 
-def delete_mill(board,row,column,mark):
+def all_mill(board,mark):
+  pass
+
+
+def delete_mill(board,mark):
+  for x in mark:
+    if board[x[0]][x[1]] == '☺' and board[x[2]][x[3]] == '☺' and board[x[4]][x[5]] == '☺':
+      continue
+    elif board[x[0]][x[1]] == '☻' and board[x[2]][x[3]] == '☻' and board[x[4]][x[5]] == '☻':
+      continue
+    else:
+      mark.remove(x)
+  return mark  
+
+def token_in_mill(board,row,column,mark):
   for x in mark:
     for i in range(0,5,2):
       if row == x[i] and column == x[i+1]:
@@ -401,17 +415,9 @@ def win(board):
   return False
 
 
-def who_win(board):
-  white_two = two(board,'☺')
-  black_two = two(board,'☻')
-
-  white_moves = no_moves(board,'☺')
-  black_moves = no_moves(board,'☻')
-
-  if white_two or white_moves:
-    return 'Felicitaciones ☻!!!'
-  if black_two or black_moves:
-    return 'Felicitaciones ☺!!!'
+def who_win(game_over,winner):
+  return ("Congratulations " + winner)
+  
 
 def game_loop():
   board = create_board()
@@ -444,10 +450,10 @@ def game_loop():
           print('To delete:')
           row,column = P[t].select()
           if P[t].is_not_my_token(board,row,column):
-            if delete_mill(board,row,column,mark):
+            if token_in_mill(board,row,column,mark):
               print('You cannot delete a token in mill')
               continue
-            else:
+            elif P[t].is_enemy_token(board,row,column):
               board = P[e].delete_a_token(board,row,column)
               delete = True
               break
@@ -460,6 +466,7 @@ def game_loop():
       if game_over:
         break
       board = P[t].slide(board)
+      mark = delete_mill(board,mark)
       mill,mark = P[t].is_mill(board,mark)
       if mill:
         print_board(board)
@@ -468,17 +475,20 @@ def game_loop():
           print('To delete:')
           row,column = P[t].select()
           if P[t].is_not_my_token(board,row,column):
-            if delete_mill(board,row,column,mark):
+            if token_in_mill(board,row,column,mark):
               print('You cannot delete a token in mill')
               continue
-            else:
+            elif P[t].is_enemy_token(board,row,column):
               board = P[e].delete_a_token(board,row,column)
               delete = True
               break
           print("That's no an enemy token.")
   print(game_over)
   print(P["1"].tokens_in_board,P["2"].tokens_in_board)
-  # print(who_win(board))
+  if game_over == P["1"].name:
+    print(who_win(P["2"].name))
+  if game_over == P["2"].name:
+    print(who_win(P["1"].name))
 
 game_loop()
 print('End Game')
