@@ -27,7 +27,6 @@ class Player():
   
   def delete_a_token(self,board,row,column):
     board[row][column] = '*'
-    self.tokens_in_board -= 1
     return board
 
   def selelct_direction(self,movements):
@@ -226,5 +225,4 @@ class Player():
         row = 4
 
     return False,mark
-
-   
+    
