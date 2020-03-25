@@ -1,3 +1,5 @@
+import random
+
 class Player():
   def __init__(self,name,token):
     self.name = name
@@ -187,7 +189,7 @@ class Player():
     return board
   
   def is_mill(self,board,mark):
-    
+
     for row in range(0,7):
       move = self.steps_allowed(row)
       column = row
@@ -225,4 +227,79 @@ class Player():
         row = 4
 
     return False,mark
-    
+
+class Bot(Player):
+  def __init__(self,name,token,difficulty):
+    super().__init__(name,token)
+    self.difficulty = difficulty
+
+  def selelct_direction(self,movements):
+    i = random.randrange(len(movements))
+    return movements[i]
+
+  def auto_move(self,board,row,column,direction,move_x,move_y):
+    if direction == 'd':
+          board = self.delete_a_token(board,row,column)
+          board = self.put_token(board,row+move_y,column)
+    elif direction == 'u':
+          board = self.delete_a_token(board,row,column)
+          board = self.put_token(board,row-move_y,column)
+    elif direction == 'r':
+        board = self.delete_a_token(board,row,column)
+        board = self.put_token(board,row,column+move_x)
+    elif direction == 'l':
+        board = self.delete_a_token(board,row,column)
+        board = self.put_token(board,row,column-move_x) 
+    return board
+  
+  def move(self,board,row,column,movements,move_x,move_y):
+
+    selected = self.selelct_direction(movements)
+
+    if selected == 'u':
+      board = self.delete_a_token(board,row,column)
+      board = self.put_token(board,row-move_y,column)
+    elif selected == 'd':
+      board = self.delete_a_token(board,row,column)
+      board = self.put_token(board,row+move_y,column)
+    elif selected == 'r':
+      board = self.delete_a_token(board,row,column)
+      board = self.put_token(board,row,column+move_x)
+    elif selected == 'l':
+      board = self.delete_a_token(board,row,column)
+      board = self.put_token(board,row,column-move_x)
+
+    return board
+
+  def places_of(self,board,objective):
+    ROW = []
+    COLUMN = []
+    for row in range(0,7):
+      for column in range(0,7):
+        if board[row][column] == objective:
+          ROW.append(row)
+          COLUMN.append(column)
+    return ROW,COLUMN
+
+  def drip(self,board):
+    row,column = self.places_of(board,"*")
+    i = random.randrange(len(row))
+    board = self.put_token(board,row[i],column[i])
+    return board
+
+  def slide(self,board):
+    row,column = self.places_of(board,self.token)
+    i = random.randrange(len(row))
+    direction_x = self.horizontal_moves(board,row[i],column[i])
+    direction_y = self.vertical_moves(board,row[i],column[i])
+    move_x = self.steps_allowed(row[i])
+    move_y = self.steps_allowed(column[i])
+
+    if direction_x or direction_y:
+      if self.just_one_move(direction_x,direction_y):
+        board = self.auto_move(board,row[i],column[i],direction_x+direction_y,move_x,move_y)
+      else:
+        board = self.move(board,row[i],column[i],direction_x+direction_y,move_x,move_y)
+    else:
+      return self.slide(board)
+    return board

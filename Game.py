@@ -1,9 +1,26 @@
 import Player
+import Menu
+import random
 
-P = {
-  "1": Player.Player('Oniel','☺'),
-  "2": Player.Player('Odabel','☻')
-}
+decision = Menu.vs()
+
+if decision == "2":
+  name1 = Menu.name("Player 1")
+  name2 = Menu.name("Player 2")
+  P = {
+    "1": Player.Player(name1,'☺'),
+    "2": Player.Player(name2,'☻')
+  }
+else:
+  decision = Menu.difficulty()
+  name = Menu.name("Player ")
+  if decision == "1": difficulty = "easy"
+  if decision == "2": difficulty = "normal"
+  if decision == "3": difficulty = "hard"
+  P = {
+    "1": Player.Player(name,'☺'),
+    "2": Player.Bot('Bot','☻',difficulty)
+  }
 
 
 def create_board():
@@ -26,8 +43,13 @@ def steps_for_delete(board,mark,t,e):
   print_board(board)
   delete = False
   while delete == False:
-    print('To delete:')
-    row,column = P[t].select()
+    if decision == "1" and P[t].name == "Bot":
+      ROW,COLUMN = P[t].places_of(board,P[e].token)
+      i = random.randrange(len(ROW))
+      row,column = ROW[i],COLUMN[i]
+    else:
+      print('To delete:')
+      row,column = P[t].select()
     if P[t].is_not_my_token(board,row,column):
       if all_mill(board,mark,P[e].token):
         if P[t].is_enemy_token(board,row,column):
@@ -132,8 +154,6 @@ def game_loop():
     print_board(board)
     if P[t].mens > 0:
       game_over = win(board)
-      print(game_over)
-      print(P["1"].tokens_in_board,P["2"].tokens_in_board)
       if game_over:
         break
       board = P[t].drip(board)
@@ -143,8 +163,6 @@ def game_loop():
       continue
     if P[t].mens == 0:
       game_over = win(board)
-      print(game_over)
-      print(P["1"].tokens_in_board,P["2"].tokens_in_board)
       if game_over:
         break
       board = P[t].slide(board)
