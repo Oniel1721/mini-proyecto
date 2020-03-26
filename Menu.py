@@ -13,5 +13,5 @@ def difficulty():
   if decision in ["1","2","3"]:
     return decision
   print("Please numbers between 1-3.")
-  return vs()
+  return difficulty()
 

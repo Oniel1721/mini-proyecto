@@ -12,11 +12,11 @@ if decision == "2":
     "2": Player.Player(name2,'☻')
   }
 else:
-  decision = Menu.difficulty()
+  level = Menu.difficulty()
   name = Menu.name("Player ")
-  if decision == "1": difficulty = "easy"
-  if decision == "2": difficulty = "normal"
-  if decision == "3": difficulty = "hard"
+  if level == "1": difficulty = "easy"
+  if level == "2": difficulty = "normal"
+  if level == "3": difficulty = "hard"
   P = {
     "1": Player.Player(name,'☺'),
     "2": Player.Bot('Bot','☻',difficulty)

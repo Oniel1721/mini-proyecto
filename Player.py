@@ -280,14 +280,56 @@ class Bot(Player):
           ROW.append(row)
           COLUMN.append(column)
     return ROW,COLUMN
-
-  def drip(self,board):
+  
+  def easy_drip(self,board):
     row,column = self.places_of(board,"*")
     i = random.randrange(len(row))
     board = self.put_token(board,row[i],column[i])
     return board
 
-  def slide(self,board):
+  def repetitive(self,start,places):
+    for i in range(start,7):
+      times = places.count(i)
+      if times == 2:
+        return i
+    return 100
+
+  def normal_drip(self,board,token):
+    row_empty,column_empty = self.places_of(board,"*")
+    row_player,column_player = self.places_of(board,token)
+    start,i,ready = 0,0,False
+    while i != 100:
+      i = self.repetitive(start,row_player)
+      if i in row_empty:
+        i = row_empty.index(i)
+        ready = True
+        break
+      start = i+1
+    start,i = 0,0
+    while ready == False and i != 100:
+      i = self.repetitive(start,column_player)
+      if i in column_empty:
+        i = column_empty.index(i)
+        ready = True
+        break
+      start = i+1
+    if ready == False:
+      if token == "☺":
+        return self.normal_drip(board,"☻")
+      else:
+        i = random.randrange(len(row_empty))
+    board = self.put_token(board,row_empty[i],column_empty[i])
+    return board
+
+  def drip(self,board):
+    if self.difficulty == "easy":
+      return self.easy_drip(board)
+    if self.difficulty == "normal":
+      return self.normal_drip(board,"☺")
+    if self.difficulty == "hard":
+      return self.normal_drip(board,"☺")
+
+  def easy_slide(self,board):
     row,column = self.places_of(board,self.token)
     i = random.randrange(len(row))
     direction_x = self.horizontal_moves(board,row[i],column[i])
@@ -301,5 +343,15 @@ class Bot(Player):
       else:
         board = self.move(board,row[i],column[i],direction_x+direction_y,move_x,move_y)
     else:
-      return self.slide(board)
+      return self.easy_slide(board)
     return board
+
+
+  def slide(self,board):
+    if self.difficulty == "easy":
+      return self.easy_slide(board)
+    if self.difficulty == "normal":
+      return self.easy_slide(board)
+    if self.difficulty == "hard":
+      return self.easy_slide(board)
+
