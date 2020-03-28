@@ -281,25 +281,24 @@ class Bot(Player):
           COLUMN.append(column)
     return ROW,COLUMN
   
-  def easy_drip(self,board):
+  def easy(self,board):
     row,column = self.places_of(board,"*")
     i = random.randrange(len(row))
-    board = self.put_token(board,row[i],column[i])
-    return board
+    return row[i],column[i]
 
-  def repetitive(self,start,places):
+  def repetitive(self,start,places,number):
     for i in range(start,7):
       times = places.count(i)
-      if times == 2:
+      if times == number:
         return i
     return 100
 
-  def normal_drip(self,board,token):
-    row_empty,column_empty = self.places_of(board,"*")
+  def normal(self,board,token,void,number):
+    row_empty,column_empty = self.places_of(board,void)
     row_player,column_player = self.places_of(board,token)
     start,i,ready = 0,0,False
     while i != 100:
-      i = self.repetitive(start,row_player)
+      i = self.repetitive(start,row_player,number)
       if i in row_empty:
         i = row_empty.index(i)
         ready = True
@@ -307,7 +306,7 @@ class Bot(Player):
       start = i+1
     start,i = 0,0
     while ready == False and i != 100:
-      i = self.repetitive(start,column_player)
+      i = self.repetitive(start,column_player,number)
       if i in column_empty:
         i = column_empty.index(i)
         ready = True
@@ -315,19 +314,20 @@ class Bot(Player):
       start = i+1
     if ready == False:
       if token == "☺":
-        return self.normal_drip(board,"☻")
+        return self.normal(board,"☻","*",number)
       else:
         i = random.randrange(len(row_empty))
-    board = self.put_token(board,row_empty[i],column_empty[i])
-    return board
+    return row_empty[i],column_empty[i]
 
   def drip(self,board):
     if self.difficulty == "easy":
-      return self.easy_drip(board)
+      row,column = self.easy(board)
     if self.difficulty == "normal":
-      return self.normal_drip(board,"☺")
+      row,column = self.normal(board,"☺","*",2)
     if self.difficulty == "hard":
-      return self.normal_drip(board,"☺")
+      row,column = self.normal(board,"☺","*",2)
+    board = self.put_token(board,row,column)
+    return board
 
   def easy_slide(self,board):
     row,column = self.places_of(board,self.token)
@@ -345,6 +345,12 @@ class Bot(Player):
     else:
       return self.easy_slide(board)
     return board
+  
+  def normal_slide(self,board):
+    row_empty,column_empty = self.places_of(board,"*")
+    row_bot,column_bot = self.places_of(board,"☻")
+    pass
+
 
 
   def slide(self,board):
@@ -353,5 +359,5 @@ class Bot(Player):
     if self.difficulty == "normal":
       return self.easy_slide(board)
     if self.difficulty == "hard":
-      return self.easy_slide(board)
+      return self.normal_slide(board)
 
