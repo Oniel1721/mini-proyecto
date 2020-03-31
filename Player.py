@@ -347,10 +347,38 @@ class Bot(Player):
     return board
   
   def normal_slide(self,board):
-    row_empty,column_empty = self.places_of(board,"*")
     row_bot,column_bot = self.places_of(board,"☻")
-    pass
+    row_empty,column_empty = self.places_of(board,"*")
+    i = self.repetitive(0,row_bot,2)
+    if i in row_empty:
+      try:
+        move_x = self.steps_allowed(i)
+        if board[i][column_empty[row_empty.index(i)]-move_x] == "☻":
+          board = self.delete_a_token(board,i,column_empty[row_empty.index(i)]-move_x)
+          board = self.put_token(board,i,column_empty[row_empty.index(i)])
+          return board
+        if board[i][column_empty[row_empty.index(i)]+move_x] == "☻":
+          board = self.delete_a_token(board,i,column_empty[row_empty.index(i)]+move_x)
+          board = self.put_token(board,i,column_empty[row_empty.index(i)])
+          return board
+      except:
+        pass
 
+    i = self.repetitive(0,column_bot,2)
+
+    if i in column_empty:
+      try:
+        move_y = self.steps_allowed(i)
+        if board[row_empty[column_empty.index(i)]-move_y][i] == "☻":
+          board = self.delete_a_token(board,[row_empty[column_empty.index(i)]-move_y],i)
+          board = self.put_token(board,[row_empty[column_empty.index(i)]],i)
+          return board
+        if board[row_empty[column_empty.index(i)]+move_y][i] == "☻":
+          board = self.delete_a_token(board,[row_empty[column_empty.index(i)]+move_y],i)
+          board = self.put_token(board,[row_empty[column_empty.index(i)]],i)
+          return board
+      except:
+        return self.easy_slide(board)
 
 
   def slide(self,board):

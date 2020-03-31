@@ -52,21 +52,20 @@ def steps_for_delete(board,mark,t,e):
       row,column = P[t].select()
     if P[t].is_not_my_token(board,row,column):
       if all_mill(board,mark,P[e].token):
-        if P[t].is_enemy_token(board,row,column):
+        print("All enemies are in mill.")
+        break
+      if P[t].is_enemy_token(board,row,column):
+        if token_in_mill(row,column,mark):
+          if decision == "1" and P[t].name == "Bot":
+            continue
+          print('You cannot delete a token in mill')
+          continue
+        else:
           board = P[e].delete_a_token(board,row,column)
           P[e].tokens_in_board -= 1
           mark = delete_mill(board,mark)
           delete = True
           break
-        elif token_in_mill(row,column,mark):
-          print('You cannot delete a token in mill')
-          continue
-      elif P[t].is_enemy_token(board,row,column):
-        board = P[e].delete_a_token(board,row,column)
-        P[e].tokens_in_board -= 1
-        mark = delete_mill(board,mark)
-        delete = True
-        break
       print("That's no an enemy token.")
   return board,mark
 
