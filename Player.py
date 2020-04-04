@@ -13,8 +13,12 @@ class Player():
   def select(self):
     print('Please numbers between 1-7.')
     try:
-      row = int(input('Select a Row: '))
-      column = int(input('Select a Column: '))
+      row = (input('Select a Row: '))
+      column = (input('Select a Column: '))
+      if row == "exit" or column == "exit":
+        return "X","T"
+      row = int(row)
+      column = int(column)
       if row not in range(1,8) or column not in range(1,8):
         return self.select()
     except:
@@ -34,6 +38,8 @@ class Player():
   def selelct_direction(self,movements):
     print('Moves allowed ' + movements)
     direction = input('Select direction: ')
+    if direction == "exit":
+      return "X"
     if direction not in movements:
       print (direction + ' its not an allowed move.')
       return self.selelct_direction(movements)
@@ -105,7 +111,10 @@ class Player():
       word = 'right'
 
     decision=input('This tile can only be moved '+word+', do you agree?(N = No, Any word = Yes)')
-
+    
+    if decision == "exit":
+      return ""
+    
     return decision != 'N'
 
   def just_one_move(self,direction_x,direction_y):
@@ -133,7 +142,8 @@ class Player():
         board = self.delete_a_token(board,row,column)
         board = self.put_token(board,row,column-move_x)
         change = True
-    
+    if self.confirm_move(direction) == "":
+      return "X"
     if change == False:
       return self.slide(board)
     
@@ -161,6 +171,8 @@ class Player():
   def drip(self,board):
     print('To place:')
     row,column = self.select()
+    if row == "X":
+      return "X"
     if self.is_valid(board,row,column):
       self.put_token(board,row,column)
       return board
@@ -170,6 +182,8 @@ class Player():
   def slide(self,board):
     print('To Select:')
     row,column = self.select()
+    if row == "X":
+      return "X"
     if self.is_not_my_token(board,row,column):
       print("that's not your token")
       return self.slide(board)
@@ -361,8 +375,9 @@ class Bot(Player):
           board = self.delete_a_token(board,i,column_empty[row_empty.index(i)]+move_x)
           board = self.put_token(board,i,column_empty[row_empty.index(i)])
           return board
+        else: return self.easy_slide(board)
       except:
-        pass
+        return self.easy_slide(board)
 
     i = self.repetitive(0,column_bot,2)
 
@@ -377,6 +392,7 @@ class Bot(Player):
           board = self.delete_a_token(board,[row_empty[column_empty.index(i)]+move_y],i)
           board = self.put_token(board,[row_empty[column_empty.index(i)]],i)
           return board
+        else: return self.easy_slide(board)
       except:
         return self.easy_slide(board)
 

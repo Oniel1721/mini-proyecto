@@ -50,6 +50,8 @@ def steps_for_delete(board,mark,t,e):
     else:
       print('To delete:')
       row,column = P[t].select()
+      if row == "X":
+        return "X"
     if P[t].is_not_my_token(board,row,column):
       if all_mill(board,mark,P[e].token):
         print("All enemies are in mill.")
@@ -156,21 +158,28 @@ def game_loop():
       if game_over:
         break
       board = P[t].drip(board)
+      if board == "X":
+        break
       mill,mark = P[t].is_mill(board,mark)
       if mill:
         board,mark = steps_for_delete(board,mark,t,e)
+        if board == "X":
+          break
       continue
     if P[t].mens == 0:
       game_over = win(board)
       if game_over:
         break
       board = P[t].slide(board)
+      if board == "X":
+        break
       mark = delete_mill(board,mark)
       mill,mark = P[t].is_mill(board,mark)
       if mill:    
         board,mark = steps_for_delete(board,mark,t,e)
-  print(game_over)
-  print(P["1"].tokens_in_board,P["2"].tokens_in_board)
+        if board == "X":
+          break
+
   if game_over == P["1"].name:
     print("Congratulations "+P["2"].name)
   if game_over == P["2"].name:
