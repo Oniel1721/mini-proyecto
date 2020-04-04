@@ -35,6 +35,16 @@ adjacent row or column.
 For select any place of board you must indicate the row and the column using
 numbers between 1 and 7.
 
+For select a direction to move, the game will send you a message with the
+movements you are allowed to make, the message will look like this "ulrd"
+those letters represent the initials of the movements, r = right, l = left
+u = up d = down. And you must write one of this letters, if the game detects 
+that you have only one move, it will send you a message like this:
+"This tile can only be moved "movement", do you agree?(N = No, Any word = Yes)"
+"movement" will be replaced by the movement you have available. if you write "N"
+it won't move, but if you write any other letter it will move in that direction.
+
+
 ##Goal of this game
 
 The goal of this game is leave your enemies with two tokens or without possibles movements.
